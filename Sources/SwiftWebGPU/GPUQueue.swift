@@ -36,9 +36,11 @@ public final class GPUQueue: @unchecked Sendable {
     }
 
     /// Returns a promise that resolves when all previously submitted work has completed.
-    public func onSubmittedWorkDone() async throws {
+    ///
+    /// This method does not throw - it always resolves when work completes.
+    public func onSubmittedWorkDone() async {
         let promise = JSPromise(jsObject.onSubmittedWorkDone!().object!)!
-        _ = try await promise.value
+        _ = await awaitPromise(promise)
     }
 
     /// Writes data to a buffer.

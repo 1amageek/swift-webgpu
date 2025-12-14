@@ -58,7 +58,10 @@ public final class GPUAdapter: @unchecked Sendable {
     ///
     /// - Parameter descriptor: Options for device creation.
     /// - Returns: A `GPUDevice`.
-    public func requestDevice(descriptor: GPUDeviceDescriptor? = nil) async throws -> GPUDevice {
+    /// - Throws: `GPURequestDeviceError` if the device cannot be created.
+    ///   - `.operationError`: The requested limits are not supported, or the adapter was already consumed.
+    ///   - `.typeError`: The requested features are not supported.
+    public func requestDevice(descriptor: GPUDeviceDescriptor? = nil) async throws(GPURequestDeviceError) -> GPUDevice {
         let promise: JSPromise
         if let descriptor = descriptor {
             promise = JSPromise(jsObject.requestDevice!(descriptor.toJSObject()).object!)!
@@ -66,8 +69,13 @@ public final class GPUAdapter: @unchecked Sendable {
             promise = JSPromise(jsObject.requestDevice!().object!)!
         }
 
-        let result = try await promise.value
-        return GPUDevice(jsObject: result.object!)
+        let result = await awaitDeviceRequest(promise)
+        switch result {
+        case .success(let value):
+            return GPUDevice(jsObject: value.object!)
+        case .failure(let error):
+            throw error
+        }
     }
 }
 

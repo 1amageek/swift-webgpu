@@ -33,9 +33,11 @@ public final class GPU: @unchecked Sendable {
 
     /// Requests an adapter from the GPU.
     ///
+    /// This method does not throw. If no adapter is available, it returns `nil`.
+    ///
     /// - Parameter options: Options for adapter selection.
     /// - Returns: A `GPUAdapter` if one is available, `nil` otherwise.
-    public func requestAdapter(options: GPURequestAdapterOptions? = nil) async throws -> GPUAdapter? {
+    public func requestAdapter(options: GPURequestAdapterOptions? = nil) async -> GPUAdapter? {
         let promise: JSPromise
         if let options = options {
             promise = JSPromise(jsObject.requestAdapter!(options.toJSObject()).object!)!
@@ -43,7 +45,7 @@ public final class GPU: @unchecked Sendable {
             promise = JSPromise(jsObject.requestAdapter!().object!)!
         }
 
-        let result = try await promise.value
+        let result = await awaitPromise(promise)
         guard !result.isNull && !result.isUndefined else {
             return nil
         }

@@ -11,9 +11,15 @@ import JavaScriptKit
 /// ```
 public final class GPUTexture: @unchecked Sendable {
     /// The underlying JavaScript `GPUTexture` object.
-    let jsObject: JSObject
+    public let jsObject: JSObject
 
-    init(jsObject: JSObject) {
+    /// Creates a GPUTexture wrapper from a JavaScript GPUTexture object.
+    ///
+    /// Use this initializer when you have a GPUTexture created in JavaScript
+    /// that you need to use in Swift.
+    ///
+    /// - Parameter jsObject: The JavaScript GPUTexture object.
+    public init(jsObject: JSObject) {
         self.jsObject = jsObject
     }
 
@@ -93,9 +99,12 @@ public final class GPUTexture: @unchecked Sendable {
 /// A view of a texture.
 public final class GPUTextureView: @unchecked Sendable {
     /// The underlying JavaScript `GPUTextureView` object.
-    let jsObject: JSObject
+    public let jsObject: JSObject
 
-    init(jsObject: JSObject) {
+    /// Creates a GPUTextureView wrapper from a JavaScript GPUTextureView object.
+    ///
+    /// - Parameter jsObject: The JavaScript GPUTextureView object.
+    public init(jsObject: JSObject) {
         self.jsObject = jsObject
     }
 
@@ -126,9 +135,12 @@ public final class GPUTextureView: @unchecked Sendable {
 /// ```
 public final class GPUExternalTexture: @unchecked Sendable {
     /// The underlying JavaScript `GPUExternalTexture` object.
-    let jsObject: JSObject
+    public let jsObject: JSObject
 
-    init(jsObject: JSObject) {
+    /// Creates a GPUExternalTexture wrapper from a JavaScript GPUExternalTexture object.
+    ///
+    /// - Parameter jsObject: The JavaScript GPUExternalTexture object.
+    public init(jsObject: JSObject) {
         self.jsObject = jsObject
     }
 

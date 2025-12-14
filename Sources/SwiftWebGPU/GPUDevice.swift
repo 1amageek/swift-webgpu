@@ -61,9 +61,11 @@ public final class GPUDevice: @unchecked Sendable {
     }
 
     /// A promise that resolves when the device is lost.
-    public func lost() async throws -> GPUDeviceLostInfo {
+    ///
+    /// This method does not throw - it always resolves when the device becomes lost.
+    public func lost() async -> GPUDeviceLostInfo {
         let promise = JSPromise(jsObject.lost.object!)!
-        let result = try await promise.value
+        let result = await awaitPromise(promise)
         return GPUDeviceLostInfo(jsObject: result.object!)
     }
 
@@ -156,17 +158,35 @@ public final class GPUDevice: @unchecked Sendable {
     }
 
     /// Creates a compute pipeline asynchronously.
-    public func createComputePipelineAsync(descriptor: GPUComputePipelineDescriptor) async throws -> GPUComputePipeline {
+    ///
+    /// - Parameter descriptor: The compute pipeline descriptor.
+    /// - Returns: A new compute pipeline.
+    /// - Throws: `GPUPipelineError` if pipeline creation fails.
+    public func createComputePipelineAsync(descriptor: GPUComputePipelineDescriptor) async throws(GPUPipelineError) -> GPUComputePipeline {
         let promise = JSPromise(jsObject.createComputePipelineAsync!(descriptor.toJSObject()).object!)!
-        let result = try await promise.value
-        return GPUComputePipeline(jsObject: result.object!)
+        let result = await awaitPipelineCreation(promise)
+        switch result {
+        case .success(let value):
+            return GPUComputePipeline(jsObject: value.object!)
+        case .failure(let error):
+            throw error
+        }
     }
 
     /// Creates a render pipeline asynchronously.
-    public func createRenderPipelineAsync(descriptor: GPURenderPipelineDescriptor) async throws -> GPURenderPipeline {
+    ///
+    /// - Parameter descriptor: The render pipeline descriptor.
+    /// - Returns: A new render pipeline.
+    /// - Throws: `GPUPipelineError` if pipeline creation fails.
+    public func createRenderPipelineAsync(descriptor: GPURenderPipelineDescriptor) async throws(GPUPipelineError) -> GPURenderPipeline {
         let promise = JSPromise(jsObject.createRenderPipelineAsync!(descriptor.toJSObject()).object!)!
-        let result = try await promise.value
-        return GPURenderPipeline(jsObject: result.object!)
+        let result = await awaitPipelineCreation(promise)
+        switch result {
+        case .success(let value):
+            return GPURenderPipeline(jsObject: value.object!)
+        case .failure(let error):
+            throw error
+        }
     }
 
     /// Creates a command encoder.
@@ -211,168 +231,22 @@ public final class GPUDevice: @unchecked Sendable {
         _ = jsObject.pushErrorScope!(filter.rawValue)
     }
 
-    /// Pops an error scope and returns any error.
-    public func popErrorScope() async throws -> GPUError? {
+    /// Pops an error scope and returns any error that was captured.
+    ///
+    /// - Returns: A `GPUScopeError` if an error was captured, `nil` otherwise.
+    public func popErrorScope() async -> GPUScopeError? {
         let promise = JSPromise(jsObject.popErrorScope!().object!)!
-        let result = try await promise.value
+        let result = await awaitPromise(promise)
         guard !result.isNull && !result.isUndefined else {
             return nil
         }
-        return GPUError(jsObject: result.object!)
+        return GPUScopeError(jsObject: result.object)
     }
 
     /// Destroys this device.
     public func destroy() {
         _ = jsObject.destroy!()
     }
-}
-
-// MARK: - GPUError
-
-/// A GPU error base type.
-public protocol GPUErrorProtocol: Sendable {
-    /// The error message.
-    var message: String { get }
-}
-
-/// A GPU error.
-public struct GPUError: GPUErrorProtocol, @unchecked Sendable {
-    let jsObject: JSObject
-
-    init(jsObject: JSObject) {
-        self.jsObject = jsObject
-    }
-
-    /// The error message.
-    public var message: String {
-        jsObject.message.string ?? ""
-    }
-
-    /// Returns the specific error type if it can be determined.
-    public func asValidationError() -> GPUValidationError? {
-        // Check if this is a GPUValidationError by checking constructor name
-        let constructorName = jsObject.constructor.name.string
-        if constructorName == "GPUValidationError" {
-            return GPUValidationError(jsObject: jsObject)
-        }
-        return nil
-    }
-
-    /// Returns the specific error type if it can be determined.
-    public func asOutOfMemoryError() -> GPUOutOfMemoryError? {
-        let constructorName = jsObject.constructor.name.string
-        if constructorName == "GPUOutOfMemoryError" {
-            return GPUOutOfMemoryError(jsObject: jsObject)
-        }
-        return nil
-    }
-
-    /// Returns the specific error type if it can be determined.
-    public func asInternalError() -> GPUInternalError? {
-        let constructorName = jsObject.constructor.name.string
-        if constructorName == "GPUInternalError" {
-            return GPUInternalError(jsObject: jsObject)
-        }
-        return nil
-    }
-}
-
-// MARK: - GPUValidationError
-
-/// A validation error from the GPU.
-public struct GPUValidationError: GPUErrorProtocol, @unchecked Sendable {
-    private let jsObject: JSObject
-
-    init(jsObject: JSObject) {
-        self.jsObject = jsObject
-    }
-
-    /// Creates a new validation error.
-    public init(message: String) {
-        self.jsObject = JSObject.global.GPUValidationError.function!.new(message)
-    }
-
-    /// The error message.
-    public var message: String {
-        jsObject.message.string ?? ""
-    }
-}
-
-// MARK: - GPUOutOfMemoryError
-
-/// An out-of-memory error from the GPU.
-public struct GPUOutOfMemoryError: GPUErrorProtocol, @unchecked Sendable {
-    private let jsObject: JSObject
-
-    init(jsObject: JSObject) {
-        self.jsObject = jsObject
-    }
-
-    /// Creates a new out-of-memory error.
-    public init(message: String) {
-        self.jsObject = JSObject.global.GPUOutOfMemoryError.function!.new(message)
-    }
-
-    /// The error message.
-    public var message: String {
-        jsObject.message.string ?? ""
-    }
-}
-
-// MARK: - GPUInternalError
-
-/// An internal error from the GPU.
-public struct GPUInternalError: GPUErrorProtocol, @unchecked Sendable {
-    private let jsObject: JSObject
-
-    init(jsObject: JSObject) {
-        self.jsObject = jsObject
-    }
-
-    /// Creates a new internal error.
-    public init(message: String) {
-        self.jsObject = JSObject.global.GPUInternalError.function!.new(message)
-    }
-
-    /// The error message.
-    public var message: String {
-        jsObject.message.string ?? ""
-    }
-}
-
-// MARK: - GPUPipelineError
-
-/// An error that occurred during pipeline creation.
-public struct GPUPipelineError: Error, @unchecked Sendable {
-    private let jsObject: JSObject
-
-    init(jsObject: JSObject) {
-        self.jsObject = jsObject
-    }
-
-    /// Creates a new pipeline error.
-    public init(message: String, reason: GPUPipelineErrorReason) {
-        let options = JSObject.global.Object.function!.new()
-        options.reason = .string(reason.rawValue)
-        self.jsObject = JSObject.global.GPUPipelineError.function!.new(message, options)
-    }
-
-    /// The error message.
-    public var message: String {
-        jsObject.message.string ?? ""
-    }
-
-    /// The reason for the pipeline error.
-    public var reason: GPUPipelineErrorReason {
-        let reasonStr = jsObject.reason.string ?? "internal"
-        return GPUPipelineErrorReason(rawValue: reasonStr) ?? .internal
-    }
-}
-
-/// The reason for a pipeline error.
-public enum GPUPipelineErrorReason: String, Sendable {
-    case validation = "validation"
-    case `internal` = "internal"
 }
 
 // MARK: - GPUDeviceLostInfo
@@ -408,7 +282,9 @@ public struct GPUUncapturedErrorEvent: @unchecked Sendable {
     }
 
     /// The error that was not captured.
-    public var error: GPUError {
-        GPUError(jsObject: jsObject.error.object!)
+    ///
+    /// Returns `nil` if the error type could not be determined.
+    public var error: GPUScopeError? {
+        GPUScopeError(jsObject: jsObject.error.object)
     }
 }

@@ -36,9 +36,12 @@ public final class GPUShaderModule: @unchecked Sendable {
     }
 
     /// Gets compilation information for this shader module.
-    public func getCompilationInfo() async throws -> GPUCompilationInfo {
+    ///
+    /// This method does not throw - it always resolves with compilation info.
+    /// Check the `messages` property for any errors or warnings.
+    public func getCompilationInfo() async -> GPUCompilationInfo {
         let promise = JSPromise(jsObject.getCompilationInfo!().object!)!
-        let result = try await promise.value
+        let result = await awaitPromise(promise)
         return GPUCompilationInfo(jsObject: result.object!)
     }
 }

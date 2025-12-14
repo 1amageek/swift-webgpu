@@ -50,8 +50,8 @@ public final class GPUBuffer: @unchecked Sendable {
     ///   - mode: The mapping mode.
     ///   - offset: The offset in bytes.
     ///   - size: The size in bytes. If nil, maps to the end of the buffer.
-    /// - Throws: An error if the mapping operation fails (e.g., `OperationError` if validation fails).
-    public func mapAsync(mode: GPUMapMode, offset: UInt64 = 0, size: UInt64? = nil) async throws {
+    /// - Throws: `GPUBufferMapError` if the mapping operation fails.
+    public func mapAsync(mode: GPUMapMode, offset: UInt64 = 0, size: UInt64? = nil) async throws(GPUBufferMapError) {
         let promise: JSPromise
         if let size = size {
             promise = JSPromise(jsObject.mapAsync!(
@@ -65,7 +65,13 @@ public final class GPUBuffer: @unchecked Sendable {
                 Double(offset)
             ).object!)!
         }
-        _ = try await promise.value
+        let result = await awaitBufferMap(promise)
+        switch result {
+        case .success:
+            return
+        case .failure(let error):
+            throw error
+        }
     }
 
     /// Gets a mapped range of the buffer.
