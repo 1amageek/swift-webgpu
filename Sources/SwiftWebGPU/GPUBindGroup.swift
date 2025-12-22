@@ -237,7 +237,7 @@ public struct GPUTextureBindingLayout: Sendable {
 
     public init(
         sampleType: GPUTextureSampleType = .float,
-        viewDimension: GPUTextureViewDimension = ._2d,
+        viewDimension: GPUTextureViewDimension = .type2D,
         multisampled: Bool = false
     ) {
         self.sampleType = sampleType
@@ -268,7 +268,7 @@ public struct GPUStorageTextureBindingLayout: Sendable {
     public init(
         access: GPUStorageTextureAccess = .writeOnly,
         format: GPUTextureFormat,
-        viewDimension: GPUTextureViewDimension = ._2d
+        viewDimension: GPUTextureViewDimension = .type2D
     ) {
         self.access = access
         self.format = format
@@ -360,6 +360,11 @@ public enum GPUBindingResource: Sendable {
     case textureView(GPUTextureView)
     case bufferBinding(GPUBufferBinding)
     case externalTexture(GPUExternalTexture)
+
+    /// Convenience method to create a buffer binding.
+    public static func buffer(_ buffer: GPUBuffer, offset: UInt64 = 0, size: UInt64? = nil) -> GPUBindingResource {
+        .bufferBinding(GPUBufferBinding(buffer: buffer, offset: offset, size: size))
+    }
 
     func toJSValue() -> JSValue {
         switch self {

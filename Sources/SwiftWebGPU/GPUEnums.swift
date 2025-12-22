@@ -74,21 +74,21 @@ public enum GPUTextureFormat: String, Sendable {
 
 /// The dimension of a texture.
 public enum GPUTextureDimension: String, Sendable {
-    case _1d = "1d"
-    case _2d = "2d"
-    case _3d = "3d"
+    case type1D = "1d"
+    case type2D = "2d"
+    case type3D = "3d"
 }
 
 // MARK: - Texture View Dimension
 
 /// The dimension of a texture view.
 public enum GPUTextureViewDimension: String, Sendable {
-    case _1d = "1d"
-    case _2d = "2d"
-    case _2dArray = "2d-array"
-    case cube = "cube"
-    case cubeArray = "cube-array"
-    case _3d = "3d"
+    case type1D = "1d"
+    case type2D = "2d"
+    case type2DArray = "2d-array"
+    case typeCube = "cube"
+    case typeCubeArray = "cube-array"
+    case type3D = "3d"
 }
 
 // MARK: - Texture Aspect

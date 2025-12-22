@@ -51,7 +51,7 @@ public final class GPUTexture: @unchecked Sendable {
     /// The dimension of this texture.
     public var dimension: GPUTextureDimension {
         let dim = jsObject.dimension.string ?? "2d"
-        return GPUTextureDimension(rawValue: dim) ?? ._2d
+        return GPUTextureDimension(rawValue: dim) ?? .type2D
     }
 
     /// The format of this texture.
@@ -232,7 +232,7 @@ public struct GPUTextureDescriptor: Sendable {
         size: GPUExtent3D,
         mipLevelCount: UInt32 = 1,
         sampleCount: UInt32 = 1,
-        dimension: GPUTextureDimension = ._2d,
+        dimension: GPUTextureDimension = .type2D,
         format: GPUTextureFormat,
         usage: GPUTextureUsage,
         viewFormats: [GPUTextureFormat] = [],
