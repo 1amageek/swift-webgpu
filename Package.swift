@@ -4,7 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "SwiftWebGPU",
-    platforms: [.macOS(.v10_15)],  // Required for JavaScriptKit dependency, ignored when building for WASM
+    platforms: [.macOS(.v13)],  // Required for JavaScriptKit dependency, ignored when building for WASM
     products: [
         .library(
             name: "SwiftWebGPU",
