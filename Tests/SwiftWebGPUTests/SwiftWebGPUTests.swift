@@ -36,19 +36,19 @@ struct EnumRawValueTests {
 
     @Test("GPUTextureDimension raw values")
     func textureDimensionRawValues() {
-        #expect(GPUTextureDimension._1d.rawValue == "1d")
-        #expect(GPUTextureDimension._2d.rawValue == "2d")
-        #expect(GPUTextureDimension._3d.rawValue == "3d")
+        #expect(GPUTextureDimension.type1D.rawValue == "1d")
+        #expect(GPUTextureDimension.type2D.rawValue == "2d")
+        #expect(GPUTextureDimension.type3D.rawValue == "3d")
     }
 
     @Test("GPUTextureViewDimension raw values")
     func textureViewDimensionRawValues() {
-        #expect(GPUTextureViewDimension._1d.rawValue == "1d")
-        #expect(GPUTextureViewDimension._2d.rawValue == "2d")
-        #expect(GPUTextureViewDimension._2dArray.rawValue == "2d-array")
-        #expect(GPUTextureViewDimension.cube.rawValue == "cube")
-        #expect(GPUTextureViewDimension.cubeArray.rawValue == "cube-array")
-        #expect(GPUTextureViewDimension._3d.rawValue == "3d")
+        #expect(GPUTextureViewDimension.type1D.rawValue == "1d")
+        #expect(GPUTextureViewDimension.type2D.rawValue == "2d")
+        #expect(GPUTextureViewDimension.type2DArray.rawValue == "2d-array")
+        #expect(GPUTextureViewDimension.typeCube.rawValue == "cube")
+        #expect(GPUTextureViewDimension.typeCubeArray.rawValue == "cube-array")
+        #expect(GPUTextureViewDimension.type3D.rawValue == "3d")
     }
 
     @Test("GPUTextureAspect raw values")
@@ -423,7 +423,7 @@ struct DescriptorTests {
         #expect(descriptor.usage.contains(.textureBinding))
         #expect(descriptor.mipLevelCount == 1)
         #expect(descriptor.sampleCount == 1)
-        #expect(descriptor.dimension == ._2d)
+        #expect(descriptor.dimension == .type2D)
     }
 
     @Test("GPUSamplerDescriptor default values")
@@ -560,7 +560,7 @@ struct DescriptorTests {
     func textureBindingLayoutDefaults() {
         let layout = GPUTextureBindingLayout()
         #expect(layout.sampleType == .float)
-        #expect(layout.viewDimension == ._2d)
+        #expect(layout.viewDimension == .type2D)
         #expect(layout.multisampled == false)
     }
 
@@ -660,6 +660,13 @@ struct CanvasConfigurationTests {
         #expect(GPUCanvasToneMappingMode.standard.rawValue == "standard")
         #expect(GPUCanvasToneMappingMode.extended.rawValue == "extended")
     }
+
+    @Test("GPUCanvasToneMapping parses modes without defaulting unknown values")
+    func canvasToneMappingParsing() {
+        #expect(GPUCanvasToneMapping(rawMode: "standard")?.mode == .standard)
+        #expect(GPUCanvasToneMapping(rawMode: "extended")?.mode == .extended)
+        #expect(GPUCanvasToneMapping(rawMode: "future-mode")?.mode == nil)
+    }
 }
 
 // MARK: - Query Set Tests
@@ -732,7 +739,7 @@ struct StorageTextureTests {
         )
         #expect(layout.access == .writeOnly)
         #expect(layout.format == .rgba8unorm)
-        #expect(layout.viewDimension == ._2d)
+        #expect(layout.viewDimension == .type2D)
     }
 
     @Test("GPUStorageTextureAccess raw values")

@@ -108,6 +108,19 @@ public struct GPUCanvasConfigurationOut: @unchecked Sendable {
         return GPUPredefinedColorSpace(rawValue: cs) ?? .srgb
     }
 
+    /// The canvas tone-mapping configuration reported by the browser.
+    ///
+    /// WebGPU implementations that do not support configurable canvas tone
+    /// mapping omit this member from `getConfiguration()`. Returning `nil`
+    /// preserves that capability signal instead of silently reporting the
+    /// standard mode.
+    public var toneMapping: GPUCanvasToneMapping? {
+        guard let toneMappingObject = jsObject.toneMapping.object else {
+            return nil
+        }
+        return GPUCanvasToneMapping(jsObject: toneMappingObject)
+    }
+
     /// The alpha mode.
     public var alphaMode: GPUCanvasAlphaMode {
         let mode = jsObject.alphaMode.string ?? "opaque"
@@ -197,6 +210,20 @@ public struct GPUCanvasToneMapping: Sendable {
 
     public init(mode: GPUCanvasToneMappingMode = .standard) {
         self.mode = mode
+    }
+
+    init?(rawMode: String) {
+        guard let mode = GPUCanvasToneMappingMode(rawValue: rawMode) else {
+            return nil
+        }
+        self.mode = mode
+    }
+
+    init?(jsObject: JSObject) {
+        guard let rawMode = jsObject.mode.string else {
+            return nil
+        }
+        self.init(rawMode: rawMode)
     }
 
     func toJSObject() -> JSObject {
