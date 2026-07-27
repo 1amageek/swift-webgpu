@@ -1,4 +1,5 @@
 import JavaScriptKit
+import JavaScriptEventLoop
 
 // MARK: - GPUError (Base Type)
 
