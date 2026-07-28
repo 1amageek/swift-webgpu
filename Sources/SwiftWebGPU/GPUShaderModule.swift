@@ -15,7 +15,7 @@ import JavaScriptKit
 ///     """
 /// ))
 /// ```
-public final class GPUShaderModule: @unchecked Sendable {
+public final class GPUShaderModule {
     /// The underlying JavaScript `GPUShaderModule` object.
     let jsObject: JSObject
 
@@ -37,11 +37,11 @@ public final class GPUShaderModule: @unchecked Sendable {
 
     /// Gets compilation information for this shader module.
     ///
-    /// This method does not throw - it always resolves with compilation info.
     /// Check the `messages` property for any errors or warnings.
-    public func getCompilationInfo() async -> GPUCompilationInfo {
+    /// - Throws: `GPUJavaScriptPromiseError` if the browser rejects the promise.
+    public nonisolated(nonsending) func getCompilationInfo() async throws(GPUJavaScriptPromiseError) -> GPUCompilationInfo {
         let promise = JSPromise(jsObject.getCompilationInfo!().object!)!
-        let result = await awaitPromise(promise)
+        let result = try await awaitPromise(promise)
         return GPUCompilationInfo(jsObject: result.object!)
     }
 }
@@ -49,7 +49,7 @@ public final class GPUShaderModule: @unchecked Sendable {
 // MARK: - GPUShaderModuleDescriptor
 
 /// Descriptor for creating a shader module.
-public struct GPUShaderModuleDescriptor: @unchecked Sendable {
+public struct GPUShaderModuleDescriptor {
     /// The WGSL shader code.
     public var code: String
 
@@ -101,7 +101,7 @@ public struct GPUShaderModuleDescriptor: @unchecked Sendable {
 // MARK: - GPUShaderModuleCompilationHint
 
 /// A hint for shader compilation.
-public struct GPUShaderModuleCompilationHint: Sendable {
+public struct GPUShaderModuleCompilationHint {
     /// The entry point name.
     public var entryPoint: String
 
@@ -124,7 +124,7 @@ public struct GPUShaderModuleCompilationHint: Sendable {
 // MARK: - GPUPipelineLayoutOrAuto
 
 /// Either a pipeline layout or "auto".
-public enum GPUPipelineLayoutOrAuto: Sendable {
+public enum GPUPipelineLayoutOrAuto {
     case layout(GPUPipelineLayout)
     case auto
 
@@ -141,7 +141,7 @@ public enum GPUPipelineLayoutOrAuto: Sendable {
 // MARK: - GPUCompilationInfo
 
 /// Information about shader compilation.
-public struct GPUCompilationInfo: @unchecked Sendable {
+public struct GPUCompilationInfo {
     private let jsObject: JSObject
 
     init(jsObject: JSObject) {
@@ -165,7 +165,7 @@ public struct GPUCompilationInfo: @unchecked Sendable {
 // MARK: - GPUCompilationMessage
 
 /// A message from shader compilation.
-public struct GPUCompilationMessage: @unchecked Sendable {
+public struct GPUCompilationMessage {
     private let jsObject: JSObject
 
     init(jsObject: JSObject) {

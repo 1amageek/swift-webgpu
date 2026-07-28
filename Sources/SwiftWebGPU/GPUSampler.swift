@@ -8,7 +8,7 @@ import JavaScriptKit
 ///     minFilter: .linear
 /// ))
 /// ```
-public final class GPUSampler: @unchecked Sendable {
+public final class GPUSampler {
     /// The underlying JavaScript `GPUSampler` object.
     let jsObject: JSObject
 

@@ -53,6 +53,10 @@ let adapter = try await gpu.requestAdapter()
 let device = try await adapter?.requestDevice()
 ```
 
+WebGPU wrappers retain JavaScript objects and are intentionally non-`Sendable`.
+Create and use them on the same JavaScript execution owner. Promise rejection is
+reported as a typed Swift error and is never returned as a fulfilled value.
+
 ### Creating a Buffer
 
 ```swift

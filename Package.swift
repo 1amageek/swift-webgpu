@@ -1,4 +1,4 @@
-// swift-tools-version: 6.3
+// swift-tools-version: 6.4
 
 import PackageDescription
 
@@ -12,7 +12,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/swiftwasm/JavaScriptKit", from: "0.53.0"),
+        .package(url: "https://github.com/swiftwasm/JavaScriptKit", exact: "0.56.1"),
     ],
     targets: [
         .target(

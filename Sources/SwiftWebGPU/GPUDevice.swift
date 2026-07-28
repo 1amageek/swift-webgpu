@@ -12,12 +12,20 @@ import JavaScriptEventLoop
 ///     usage: [.vertex, .copyDst]
 /// ))
 /// ```
-public final class GPUDevice: @unchecked Sendable {
+public final class GPUDevice {
     /// The underlying JavaScript `GPUDevice` object.
     let jsObject: JSObject
 
-    init(jsObject: JSObject) {
+    @_spi(JavaScriptOwner)
+    public init(jsObject: JSObject) {
         self.jsObject = jsObject
+    }
+
+    /// Returns the owner-thread-bound JavaScript object for integration layers
+    /// that persist WebGPU handles in the current JavaScript global object.
+    @_spi(JavaScriptOwner)
+    public var ownerBoundJSObject: JSObject {
+        jsObject
     }
 
     /// The set of features enabled on this device.
@@ -62,10 +70,10 @@ public final class GPUDevice: @unchecked Sendable {
 
     /// A promise that resolves when the device is lost.
     ///
-    /// This method does not throw - it always resolves when the device becomes lost.
-    public func lost() async -> GPUDeviceLostInfo {
+    /// - Throws: `GPUJavaScriptPromiseError` if the browser rejects the promise.
+    public nonisolated(nonsending) func lost() async throws(GPUJavaScriptPromiseError) -> GPUDeviceLostInfo {
         let promise = JSPromise(jsObject.lost.object!)!
-        let result = await awaitPromise(promise)
+        let result = try await awaitPromise(promise)
         return GPUDeviceLostInfo(jsObject: result.object!)
     }
 
@@ -162,7 +170,9 @@ public final class GPUDevice: @unchecked Sendable {
     /// - Parameter descriptor: The compute pipeline descriptor.
     /// - Returns: A new compute pipeline.
     /// - Throws: `GPUPipelineError` if pipeline creation fails.
-    public func createComputePipelineAsync(descriptor: GPUComputePipelineDescriptor) async throws(GPUPipelineError) -> GPUComputePipeline {
+    public nonisolated(nonsending) func createComputePipelineAsync(
+        descriptor: GPUComputePipelineDescriptor
+    ) async throws(GPUPipelineError) -> GPUComputePipeline {
         let promise = JSPromise(jsObject.createComputePipelineAsync!(descriptor.toJSObject()).object!)!
         let result = await awaitPipelineCreation(promise)
         switch result {
@@ -178,7 +188,9 @@ public final class GPUDevice: @unchecked Sendable {
     /// - Parameter descriptor: The render pipeline descriptor.
     /// - Returns: A new render pipeline.
     /// - Throws: `GPUPipelineError` if pipeline creation fails.
-    public func createRenderPipelineAsync(descriptor: GPURenderPipelineDescriptor) async throws(GPUPipelineError) -> GPURenderPipeline {
+    public nonisolated(nonsending) func createRenderPipelineAsync(
+        descriptor: GPURenderPipelineDescriptor
+    ) async throws(GPUPipelineError) -> GPURenderPipeline {
         let promise = JSPromise(jsObject.createRenderPipelineAsync!(descriptor.toJSObject()).object!)!
         let result = await awaitPipelineCreation(promise)
         switch result {
@@ -234,9 +246,9 @@ public final class GPUDevice: @unchecked Sendable {
     /// Pops an error scope and returns any error that was captured.
     ///
     /// - Returns: A `GPUScopeError` if an error was captured, `nil` otherwise.
-    public func popErrorScope() async -> GPUScopeError? {
+    public nonisolated(nonsending) func popErrorScope() async throws(GPUJavaScriptPromiseError) -> GPUScopeError? {
         let promise = JSPromise(jsObject.popErrorScope!().object!)!
-        let result = await awaitPromise(promise)
+        let result = try await awaitPromise(promise)
         guard !result.isNull && !result.isUndefined else {
             return nil
         }
@@ -252,7 +264,7 @@ public final class GPUDevice: @unchecked Sendable {
 // MARK: - GPUDeviceLostInfo
 
 /// Information about a lost device.
-public struct GPUDeviceLostInfo: @unchecked Sendable {
+public struct GPUDeviceLostInfo {
     private let jsObject: JSObject
 
     init(jsObject: JSObject) {
@@ -274,7 +286,7 @@ public struct GPUDeviceLostInfo: @unchecked Sendable {
 // MARK: - GPUUncapturedErrorEvent
 
 /// An event fired when an uncaptured GPU error occurs.
-public struct GPUUncapturedErrorEvent: @unchecked Sendable {
+public struct GPUUncapturedErrorEvent {
     private let jsObject: JSObject
 
     init(jsObject: JSObject) {

@@ -11,7 +11,7 @@ import JavaScriptKit
 /// let texture = context.getCurrentTexture()
 /// let view = texture.createView()
 /// ```
-public final class GPUCanvasContext: @unchecked Sendable {
+public final class GPUCanvasContext {
     /// The underlying JavaScript `GPUCanvasContext` object.
     let jsObject: JSObject
 
@@ -65,7 +65,7 @@ public final class GPUCanvasContext: @unchecked Sendable {
 // MARK: - GPUCanvasConfigurationOut
 
 /// The returned configuration from getConfiguration().
-public struct GPUCanvasConfigurationOut: @unchecked Sendable {
+public struct GPUCanvasConfigurationOut {
     private let jsObject: JSObject
 
     init(jsObject: JSObject) {
@@ -131,7 +131,7 @@ public struct GPUCanvasConfigurationOut: @unchecked Sendable {
 // MARK: - GPUCanvasConfiguration
 
 /// Configuration for a canvas context.
-public struct GPUCanvasConfiguration: @unchecked Sendable {
+public struct GPUCanvasConfiguration {
     /// The device to use.
     public var device: GPUDevice
 

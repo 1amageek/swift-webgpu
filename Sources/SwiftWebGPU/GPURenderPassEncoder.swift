@@ -9,7 +9,7 @@ import JavaScriptKit
 /// renderPass.draw(vertexCount: 3)
 /// renderPass.end()
 /// ```
-public final class GPURenderPassEncoder: @unchecked Sendable {
+public final class GPURenderPassEncoder {
     /// The underlying JavaScript `GPURenderPassEncoder` object.
     let jsObject: JSObject
 
@@ -205,7 +205,7 @@ public final class GPURenderPassEncoder: @unchecked Sendable {
 // MARK: - GPUComputePassEncoder
 
 /// A GPU compute pass encoder for encoding compute commands.
-public final class GPUComputePassEncoder: @unchecked Sendable {
+public final class GPUComputePassEncoder {
     /// The underlying JavaScript `GPUComputePassEncoder` object.
     let jsObject: JSObject
 
@@ -285,7 +285,7 @@ public final class GPUComputePassEncoder: @unchecked Sendable {
 // MARK: - GPURenderBundle
 
 /// A GPU render bundle containing pre-recorded render commands.
-public final class GPURenderBundle: @unchecked Sendable {
+public final class GPURenderBundle {
     /// The underlying JavaScript `GPURenderBundle` object.
     let jsObject: JSObject
 
@@ -309,7 +309,7 @@ public final class GPURenderBundle: @unchecked Sendable {
 // MARK: - GPURenderBundleEncoder
 
 /// A GPU render bundle encoder for recording render commands into a bundle.
-public final class GPURenderBundleEncoder: @unchecked Sendable {
+public final class GPURenderBundleEncoder {
     /// The underlying JavaScript `GPURenderBundleEncoder` object.
     let jsObject: JSObject
 

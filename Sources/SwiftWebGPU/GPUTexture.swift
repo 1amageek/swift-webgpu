@@ -9,7 +9,7 @@ import JavaScriptKit
 ///     usage: [.textureBinding, .copyDst]
 /// ))
 /// ```
-public final class GPUTexture: @unchecked Sendable {
+public final class GPUTexture {
     /// The underlying JavaScript `GPUTexture` object.
     public let jsObject: JSObject
 
@@ -97,7 +97,7 @@ public final class GPUTexture: @unchecked Sendable {
 // MARK: - GPUTextureView
 
 /// A view of a texture.
-public final class GPUTextureView: @unchecked Sendable {
+public final class GPUTextureView {
     /// The underlying JavaScript `GPUTextureView` object.
     public let jsObject: JSObject
 
@@ -133,7 +133,7 @@ public final class GPUTextureView: @unchecked Sendable {
 ///     source: video
 /// ))
 /// ```
-public final class GPUExternalTexture: @unchecked Sendable {
+public final class GPUExternalTexture {
     /// The underlying JavaScript `GPUExternalTexture` object.
     public let jsObject: JSObject
 
@@ -167,7 +167,7 @@ public final class GPUExternalTexture: @unchecked Sendable {
 // MARK: - GPUExternalTextureDescriptor
 
 /// Descriptor for importing an external texture.
-public struct GPUExternalTextureDescriptor: @unchecked Sendable {
+public struct GPUExternalTextureDescriptor {
     /// The video source (HTMLVideoElement or VideoFrame).
     public var source: JSObject
 

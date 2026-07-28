@@ -26,26 +26,19 @@ public protocol GPUErrorProtocol: Error, Sendable {
 ///     print("Validation error: \(error.message)")
 /// }
 /// ```
-public struct GPUValidationError: GPUErrorProtocol, @unchecked Sendable {
-    private let jsObject: JSObject?
-    private let _message: String
+public struct GPUValidationError: GPUErrorProtocol {
+    public let message: String
 
     /// A human-readable message explaining why the error occurred.
-    public var message: String {
-        jsObject?.message.string ?? _message
-    }
-
     init(jsObject: JSObject) {
-        self.jsObject = jsObject
-        self._message = ""
+        self.message = jsObject.message.string ?? ""
     }
 
     /// Creates a new validation error with the specified message.
     ///
     /// - Parameter message: A human-readable description of the error.
     public init(message: String) {
-        self.jsObject = nil
-        self._message = message
+        self.message = message
     }
 
     /// Creates a JavaScript GPUValidationError object.
@@ -71,26 +64,19 @@ public struct GPUValidationError: GPUErrorProtocol, @unchecked Sendable {
 ///     print("Out of memory: \(error.message)")
 /// }
 /// ```
-public struct GPUOutOfMemoryError: GPUErrorProtocol, @unchecked Sendable {
-    private let jsObject: JSObject?
-    private let _message: String
+public struct GPUOutOfMemoryError: GPUErrorProtocol {
+    public let message: String
 
     /// A human-readable message explaining why the error occurred.
-    public var message: String {
-        jsObject?.message.string ?? _message
-    }
-
     init(jsObject: JSObject) {
-        self.jsObject = jsObject
-        self._message = ""
+        self.message = jsObject.message.string ?? ""
     }
 
     /// Creates a new out-of-memory error with the specified message.
     ///
     /// - Parameter message: A human-readable description of the error.
     public init(message: String) {
-        self.jsObject = nil
-        self._message = message
+        self.message = message
     }
 
     /// Creates a JavaScript GPUOutOfMemoryError object.
@@ -119,26 +105,19 @@ public struct GPUOutOfMemoryError: GPUErrorProtocol, @unchecked Sendable {
 ///     print("Internal error: \(error.message)")
 /// }
 /// ```
-public struct GPUInternalError: GPUErrorProtocol, @unchecked Sendable {
-    private let jsObject: JSObject?
-    private let _message: String
+public struct GPUInternalError: GPUErrorProtocol {
+    public let message: String
 
     /// A human-readable message explaining why the error occurred.
-    public var message: String {
-        jsObject?.message.string ?? _message
-    }
-
     init(jsObject: JSObject) {
-        self.jsObject = jsObject
-        self._message = ""
+        self.message = jsObject.message.string ?? ""
     }
 
     /// Creates a new internal error with the specified message.
     ///
     /// - Parameter message: A human-readable description of the error.
     public init(message: String) {
-        self.jsObject = nil
-        self._message = message
+        self.message = message
     }
 
     /// Creates a JavaScript GPUInternalError object.
@@ -161,29 +140,15 @@ public struct GPUInternalError: GPUErrorProtocol, @unchecked Sendable {
 ///     print("Pipeline creation failed (\(error.reason)): \(error.message)")
 /// }
 /// ```
-public struct GPUPipelineError: Error, @unchecked Sendable {
-    private let jsObject: JSObject?
-    private let _message: String
-    private let _reason: GPUPipelineErrorReason
+public struct GPUPipelineError: Error, Sendable {
+    public let message: String
+    public let reason: GPUPipelineErrorReason
 
     /// A human-readable message explaining why the error occurred.
-    public var message: String {
-        jsObject?.message.string ?? _message
-    }
-
-    /// The reason for the pipeline error.
-    public var reason: GPUPipelineErrorReason {
-        if let jsObject = jsObject,
-           let reasonStr = jsObject.reason.string {
-            return GPUPipelineErrorReason(rawValue: reasonStr) ?? .internal
-        }
-        return _reason
-    }
-
     init(jsObject: JSObject) {
-        self.jsObject = jsObject
-        self._message = ""
-        self._reason = .internal
+        self.message = jsObject.message.string ?? ""
+        self.reason = jsObject.reason.string
+            .flatMap(GPUPipelineErrorReason.init(rawValue:)) ?? .internal
     }
 
     /// Creates a new pipeline error.
@@ -192,9 +157,8 @@ public struct GPUPipelineError: Error, @unchecked Sendable {
     ///   - message: A human-readable description of the error.
     ///   - reason: The reason for the pipeline error.
     public init(message: String, reason: GPUPipelineErrorReason) {
-        self.jsObject = nil
-        self._message = message
-        self._reason = reason
+        self.message = message
+        self.reason = reason
     }
 
     /// Creates a JavaScript GPUPipelineError object.
@@ -235,6 +199,18 @@ public enum GPUBufferMapError: Error, Sendable {
     case aborted
     /// Unknown error.
     case unknown(message: String)
+}
+
+/// A rejection from a JavaScript promise that does not define a more specific
+/// WebGPU error contract.
+public struct GPUJavaScriptPromiseError: Error, Sendable {
+    public let name: String
+    public let message: String
+
+    init(jsValue: JSValue) {
+        self.name = jsValue.object?.name.string ?? "Error"
+        self.message = jsValue.object?.message.string ?? "JavaScript promise rejected"
+    }
 }
 
 // MARK: - Error Scope Result
@@ -282,30 +258,31 @@ public enum GPUScopeError: Sendable {
 
 // MARK: - Promise Helpers
 
-/// Awaits a JavaScript Promise and returns its result.
-/// Uses JSPromise.result which is Embedded Swift compatible.
+/// Awaits a JavaScript Promise and returns its fulfilled value.
+/// Preserves the caller's actor isolation while awaiting the promise value.
 @inline(__always)
-public func awaitPromise(_ promise: JSPromise) async -> JSValue {
-    let result = await promise.result
-    switch result {
-    case .success(let value):
-        return value
-    case .failure(let error):
-        // For promises that shouldn't reject, return the error value anyway
-        return error
+public func awaitPromise(
+    _ promise: JSPromise,
+    isolation: isolated (any Actor)? = #isolation
+) async throws(GPUJavaScriptPromiseError) -> JSValue {
+    do {
+        return try await promise.value(isolation: isolation)
+    } catch let error {
+        throw GPUJavaScriptPromiseError(jsValue: error.thrownValue)
     }
 }
 
 /// Awaits a JavaScript Promise that may reject with a GPURequestDeviceError.
 @inline(__always)
-func awaitDeviceRequest(_ promise: JSPromise) async -> Result<JSValue, GPURequestDeviceError> {
-    let result = await promise.result
-    switch result {
-    case .success(let value):
-        return .success(value)
-    case .failure(let error):
-        let name = error.object?.name.string ?? ""
-        let message = error.object?.message.string ?? "Unknown error"
+func awaitDeviceRequest(
+    _ promise: JSPromise,
+    isolation: isolated (any Actor)? = #isolation
+) async -> Result<JSValue, GPURequestDeviceError> {
+    do {
+        return .success(try await promise.value(isolation: isolation))
+    } catch let exception {
+        let name = exception.thrownValue.object?.name.string ?? ""
+        let message = exception.thrownValue.object?.message.string ?? "Unknown error"
 
         let swiftError: GPURequestDeviceError
         switch name {
@@ -320,14 +297,15 @@ func awaitDeviceRequest(_ promise: JSPromise) async -> Result<JSValue, GPUReques
 
 /// Awaits a JavaScript Promise that may reject with a GPUPipelineError.
 @inline(__always)
-func awaitPipelineCreation(_ promise: JSPromise) async -> Result<JSValue, GPUPipelineError> {
-    let result = await promise.result
-    switch result {
-    case .success(let value):
-        return .success(value)
-    case .failure(let error):
+func awaitPipelineCreation(
+    _ promise: JSPromise,
+    isolation: isolated (any Actor)? = #isolation
+) async -> Result<JSValue, GPUPipelineError> {
+    do {
+        return .success(try await promise.value(isolation: isolation))
+    } catch let exception {
         let pipelineError: GPUPipelineError
-        if let obj = error.object {
+        if let obj = exception.thrownValue.object {
             pipelineError = GPUPipelineError(jsObject: obj)
         } else {
             pipelineError = GPUPipelineError(message: "Unknown error", reason: .internal)
@@ -338,14 +316,16 @@ func awaitPipelineCreation(_ promise: JSPromise) async -> Result<JSValue, GPUPip
 
 /// Awaits a JavaScript Promise that may reject with a GPUBufferMapError.
 @inline(__always)
-func awaitBufferMap(_ promise: JSPromise) async -> Result<Void, GPUBufferMapError> {
-    let result = await promise.result
-    switch result {
-    case .success:
+func awaitBufferMap(
+    _ promise: JSPromise,
+    isolation: isolated (any Actor)? = #isolation
+) async -> Result<Void, GPUBufferMapError> {
+    do {
+        _ = try await promise.value(isolation: isolation)
         return .success(())
-    case .failure(let error):
-        let name = error.object?.name.string ?? ""
-        let message = error.object?.message.string ?? "Unknown error"
+    } catch let exception {
+        let name = exception.thrownValue.object?.name.string ?? ""
+        let message = exception.thrownValue.object?.message.string ?? "Unknown error"
 
         let swiftError: GPUBufferMapError
         switch name {

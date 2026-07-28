@@ -16,7 +16,7 @@ import JavaScriptKit
 ///     )
 /// ))
 /// ```
-public final class GPURenderPipeline: @unchecked Sendable {
+public final class GPURenderPipeline {
     /// The underlying JavaScript `GPURenderPipeline` object.
     let jsObject: JSObject
 
@@ -46,7 +46,7 @@ public final class GPURenderPipeline: @unchecked Sendable {
 // MARK: - GPUComputePipeline
 
 /// A GPU compute pipeline for compute operations.
-public final class GPUComputePipeline: @unchecked Sendable {
+public final class GPUComputePipeline {
     /// The underlying JavaScript `GPUComputePipeline` object.
     let jsObject: JSObject
 
@@ -76,7 +76,7 @@ public final class GPUComputePipeline: @unchecked Sendable {
 // MARK: - GPURenderPipelineDescriptor
 
 /// Descriptor for creating a render pipeline.
-public struct GPURenderPipelineDescriptor: Sendable {
+public struct GPURenderPipelineDescriptor {
     /// The vertex state.
     public var vertex: GPUVertexState
 
@@ -144,7 +144,7 @@ public struct GPURenderPipelineDescriptor: Sendable {
 // MARK: - GPUComputePipelineDescriptor
 
 /// Descriptor for creating a compute pipeline.
-public struct GPUComputePipelineDescriptor: Sendable {
+public struct GPUComputePipelineDescriptor {
     /// The compute state.
     public var compute: GPUProgrammableStage
 
@@ -179,7 +179,7 @@ public struct GPUComputePipelineDescriptor: Sendable {
 // MARK: - GPUProgrammableStage
 
 /// A programmable stage in a pipeline.
-public struct GPUProgrammableStage: Sendable {
+public struct GPUProgrammableStage {
     /// The shader module.
     public var module: GPUShaderModule
 
@@ -219,7 +219,7 @@ public struct GPUProgrammableStage: Sendable {
 // MARK: - GPUVertexState
 
 /// The vertex state for a render pipeline.
-public struct GPUVertexState: Sendable {
+public struct GPUVertexState {
     /// The shader module.
     public var module: GPUShaderModule
 
@@ -534,7 +534,7 @@ public struct GPUMultisampleState: Sendable {
 // MARK: - GPUFragmentState
 
 /// The fragment state for a render pipeline.
-public struct GPUFragmentState: Sendable {
+public struct GPUFragmentState {
     /// The shader module.
     public var module: GPUShaderModule
 

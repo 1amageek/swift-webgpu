@@ -8,7 +8,7 @@ import JavaScriptKit
 ///     usage: [.vertex, .copyDst]
 /// ))
 /// ```
-public final class GPUBuffer: @unchecked Sendable {
+public final class GPUBuffer {
     /// The underlying JavaScript `GPUBuffer` object.
     let jsObject: JSObject
 
@@ -51,7 +51,11 @@ public final class GPUBuffer: @unchecked Sendable {
     ///   - offset: The offset in bytes.
     ///   - size: The size in bytes. If nil, maps to the end of the buffer.
     /// - Throws: `GPUBufferMapError` if the mapping operation fails.
-    public func mapAsync(mode: GPUMapMode, offset: UInt64 = 0, size: UInt64? = nil) async throws(GPUBufferMapError) {
+    public nonisolated(nonsending) func mapAsync(
+        mode: GPUMapMode,
+        offset: UInt64 = 0,
+        size: UInt64? = nil
+    ) async throws(GPUBufferMapError) {
         let promise: JSPromise
         if let size = size {
             promise = JSPromise(jsObject.mapAsync!(

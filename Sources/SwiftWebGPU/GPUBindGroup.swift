@@ -3,7 +3,7 @@ import JavaScriptKit
 // MARK: - GPUBindGroupLayout
 
 /// A bind group layout defines the structure of a bind group.
-public final class GPUBindGroupLayout: @unchecked Sendable {
+public final class GPUBindGroupLayout {
     /// The underlying JavaScript `GPUBindGroupLayout` object.
     let jsObject: JSObject
 
@@ -27,7 +27,7 @@ public final class GPUBindGroupLayout: @unchecked Sendable {
 // MARK: - GPUBindGroup
 
 /// A bind group contains resources bound to a shader.
-public final class GPUBindGroup: @unchecked Sendable {
+public final class GPUBindGroup {
     /// The underlying JavaScript `GPUBindGroup` object.
     let jsObject: JSObject
 
@@ -51,7 +51,7 @@ public final class GPUBindGroup: @unchecked Sendable {
 // MARK: - GPUPipelineLayout
 
 /// A pipeline layout defines the layout of bind groups for a pipeline.
-public final class GPUPipelineLayout: @unchecked Sendable {
+public final class GPUPipelineLayout {
     /// The underlying JavaScript `GPUPipelineLayout` object.
     let jsObject: JSObject
 
@@ -292,7 +292,7 @@ public struct GPUExternalTextureBindingLayout: Sendable {
 // MARK: - GPUBindGroupDescriptor
 
 /// Descriptor for creating a bind group.
-public struct GPUBindGroupDescriptor: Sendable {
+public struct GPUBindGroupDescriptor {
     /// The bind group layout.
     public var layout: GPUBindGroupLayout
 
@@ -332,7 +332,7 @@ public struct GPUBindGroupDescriptor: Sendable {
 // MARK: - GPUBindGroupEntry
 
 /// An entry in a bind group.
-public struct GPUBindGroupEntry: Sendable {
+public struct GPUBindGroupEntry {
     /// The binding index.
     public var binding: UInt32
 
@@ -355,7 +355,7 @@ public struct GPUBindGroupEntry: Sendable {
 // MARK: - GPUBindingResource
 
 /// A resource that can be bound in a bind group.
-public enum GPUBindingResource: Sendable {
+public enum GPUBindingResource {
     case sampler(GPUSampler)
     case textureView(GPUTextureView)
     case bufferBinding(GPUBufferBinding)
@@ -383,7 +383,7 @@ public enum GPUBindingResource: Sendable {
 // MARK: - GPUBufferBinding
 
 /// A buffer binding.
-public struct GPUBufferBinding: Sendable {
+public struct GPUBufferBinding {
     /// The buffer to bind.
     public var buffer: GPUBuffer
 
@@ -413,7 +413,7 @@ public struct GPUBufferBinding: Sendable {
 // MARK: - GPUPipelineLayoutDescriptor
 
 /// Descriptor for creating a pipeline layout.
-public struct GPUPipelineLayoutDescriptor: Sendable {
+public struct GPUPipelineLayoutDescriptor {
     /// The bind group layouts.
     public var bindGroupLayouts: [GPUBindGroupLayout]
 

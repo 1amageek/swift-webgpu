@@ -12,7 +12,7 @@ import JavaScriptEventLoop
 /// }
 /// let adapter = try await gpu.requestAdapter()
 /// ```
-public final class GPU: @unchecked Sendable {
+public final class GPU {
     /// The underlying JavaScript `GPU` object.
     private let jsObject: JSObject
 
@@ -33,11 +33,12 @@ public final class GPU: @unchecked Sendable {
 
     /// Requests an adapter from the GPU.
     ///
-    /// This method does not throw. If no adapter is available, it returns `nil`.
-    ///
     /// - Parameter options: Options for adapter selection.
     /// - Returns: A `GPUAdapter` if one is available, `nil` otherwise.
-    public func requestAdapter(options: GPURequestAdapterOptions? = nil) async -> GPUAdapter? {
+    /// - Throws: `GPUJavaScriptPromiseError` if the browser rejects the request.
+    public nonisolated(nonsending) func requestAdapter(
+        options: GPURequestAdapterOptions? = nil
+    ) async throws(GPUJavaScriptPromiseError) -> GPUAdapter? {
         let promise: JSPromise
         if let options = options {
             promise = JSPromise(jsObject.requestAdapter!(options.toJSObject()).object!)!
@@ -45,7 +46,7 @@ public final class GPU: @unchecked Sendable {
             promise = JSPromise(jsObject.requestAdapter!().object!)!
         }
 
-        let result = await awaitPromise(promise)
+        let result = try await awaitPromise(promise)
         guard !result.isNull && !result.isUndefined else {
             return nil
         }

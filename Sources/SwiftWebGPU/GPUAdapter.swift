@@ -13,7 +13,7 @@ import JavaScriptEventLoop
 /// print("Adapter: \(adapter.info.vendor)")
 /// let device = try await adapter.requestDevice()
 /// ```
-public final class GPUAdapter: @unchecked Sendable {
+public final class GPUAdapter {
     /// The underlying JavaScript `GPUAdapter` object.
     let jsObject: JSObject
 
@@ -61,7 +61,9 @@ public final class GPUAdapter: @unchecked Sendable {
     /// - Throws: `GPURequestDeviceError` if the device cannot be created.
     ///   - `.operationError`: The requested limits are not supported, or the adapter was already consumed.
     ///   - `.typeError`: The requested features are not supported.
-    public func requestDevice(descriptor: GPUDeviceDescriptor? = nil) async throws(GPURequestDeviceError) -> GPUDevice {
+    public nonisolated(nonsending) func requestDevice(
+        descriptor: GPUDeviceDescriptor? = nil
+    ) async throws(GPURequestDeviceError) -> GPUDevice {
         let promise: JSPromise
         if let descriptor = descriptor {
             promise = JSPromise(jsObject.requestDevice!(descriptor.toJSObject()).object!)!
@@ -82,7 +84,7 @@ public final class GPUAdapter: @unchecked Sendable {
 // MARK: - GPUAdapterInfo
 
 /// Information about a GPU adapter.
-public struct GPUAdapterInfo: @unchecked Sendable {
+public struct GPUAdapterInfo {
     private let jsObject: JSObject
 
     init(jsObject: JSObject) {
@@ -129,7 +131,7 @@ public struct GPUAdapterInfo: @unchecked Sendable {
 // MARK: - GPUSupportedLimits
 
 /// The limits supported by an adapter or device.
-public struct GPUSupportedLimits: @unchecked Sendable {
+public struct GPUSupportedLimits {
     private let jsObject: JSObject
 
     init(jsObject: JSObject) {

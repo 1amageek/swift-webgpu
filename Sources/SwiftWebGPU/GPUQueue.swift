@@ -6,7 +6,7 @@ import JavaScriptKit
 /// let commandBuffer = encoder.finish()
 /// device.queue.submit([commandBuffer])
 /// ```
-public final class GPUQueue: @unchecked Sendable {
+public final class GPUQueue {
     /// The underlying JavaScript `GPUQueue` object.
     let jsObject: JSObject
 
@@ -37,10 +37,10 @@ public final class GPUQueue: @unchecked Sendable {
 
     /// Returns a promise that resolves when all previously submitted work has completed.
     ///
-    /// This method does not throw - it always resolves when work completes.
-    public func onSubmittedWorkDone() async {
+    /// - Throws: `GPUJavaScriptPromiseError` if the browser rejects the promise.
+    public nonisolated(nonsending) func onSubmittedWorkDone() async throws(GPUJavaScriptPromiseError) {
         let promise = JSPromise(jsObject.onSubmittedWorkDone!().object!)!
-        _ = await awaitPromise(promise)
+        _ = try await awaitPromise(promise)
     }
 
     /// Writes data to a buffer.
@@ -126,7 +126,7 @@ public struct GPUImageDataLayout: Sendable {
 // MARK: - GPUImageCopyExternalImage
 
 /// An external image to copy from.
-public struct GPUImageCopyExternalImage: @unchecked Sendable {
+public struct GPUImageCopyExternalImage {
     /// The source image (ImageBitmap, HTMLCanvasElement, etc.).
     public var source: JSObject
 
@@ -158,7 +158,7 @@ public struct GPUImageCopyExternalImage: @unchecked Sendable {
 // MARK: - GPUImageCopyTextureTagged
 
 /// A texture copy destination with color space information.
-public struct GPUImageCopyTextureTagged: Sendable {
+public struct GPUImageCopyTextureTagged {
     /// The texture.
     public var texture: GPUTexture
 
@@ -225,7 +225,7 @@ public struct GPUOrigin2D: Sendable {
 // MARK: - GPUQuerySet
 
 /// A GPU query set for collecting GPU timing and occlusion data.
-public final class GPUQuerySet: @unchecked Sendable {
+public final class GPUQuerySet {
     /// The underlying JavaScript `GPUQuerySet` object.
     let jsObject: JSObject
 

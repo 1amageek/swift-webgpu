@@ -11,7 +11,7 @@ import JavaScriptKit
 /// let commandBuffer = encoder.finish()
 /// device.queue.submit([commandBuffer])
 /// ```
-public final class GPUCommandEncoder: @unchecked Sendable {
+public final class GPUCommandEncoder {
     /// The underlying JavaScript `GPUCommandEncoder` object.
     let jsObject: JSObject
 
@@ -180,7 +180,7 @@ public struct GPUCommandEncoderDescriptor: Sendable {
 // MARK: - GPUCommandBuffer
 
 /// A GPU command buffer containing recorded commands.
-public final class GPUCommandBuffer: @unchecked Sendable {
+public final class GPUCommandBuffer {
     /// The underlying JavaScript `GPUCommandBuffer` object.
     let jsObject: JSObject
 
@@ -224,7 +224,7 @@ public struct GPUCommandBufferDescriptor: Sendable {
 // MARK: - GPURenderPassDescriptor
 
 /// Descriptor for beginning a render pass.
-public struct GPURenderPassDescriptor: Sendable {
+public struct GPURenderPassDescriptor {
     /// The color attachments.
     public var colorAttachments: [GPURenderPassColorAttachment?]
 
@@ -292,7 +292,7 @@ public struct GPURenderPassDescriptor: Sendable {
 // MARK: - GPURenderPassColorAttachment
 
 /// A color attachment for a render pass.
-public struct GPURenderPassColorAttachment: Sendable {
+public struct GPURenderPassColorAttachment {
     /// The texture view to render to.
     public var view: GPUTextureView
 
@@ -340,7 +340,7 @@ public struct GPURenderPassColorAttachment: Sendable {
 // MARK: - GPURenderPassDepthStencilAttachment
 
 /// A depth/stencil attachment for a render pass.
-public struct GPURenderPassDepthStencilAttachment: Sendable {
+public struct GPURenderPassDepthStencilAttachment {
     /// The texture view.
     public var view: GPUTextureView
 
@@ -418,7 +418,7 @@ public struct GPURenderPassDepthStencilAttachment: Sendable {
 // MARK: - GPURenderPassTimestampWrites
 
 /// Timestamp writes for a render pass.
-public struct GPURenderPassTimestampWrites: Sendable {
+public struct GPURenderPassTimestampWrites {
     /// The query set.
     public var querySet: GPUQuerySet
 
@@ -454,7 +454,7 @@ public struct GPURenderPassTimestampWrites: Sendable {
 // MARK: - GPUComputePassDescriptor
 
 /// Descriptor for beginning a compute pass.
-public struct GPUComputePassDescriptor: Sendable {
+public struct GPUComputePassDescriptor {
     /// Timestamp writes for the pass.
     public var timestampWrites: GPUComputePassTimestampWrites?
 
@@ -484,7 +484,7 @@ public struct GPUComputePassDescriptor: Sendable {
 // MARK: - GPUComputePassTimestampWrites
 
 /// Timestamp writes for a compute pass.
-public struct GPUComputePassTimestampWrites: Sendable {
+public struct GPUComputePassTimestampWrites {
     /// The query set.
     public var querySet: GPUQuerySet
 
@@ -557,7 +557,7 @@ public struct GPUColor: Sendable {
 // MARK: - Image Copy Types
 
 /// A buffer image copy.
-public struct GPUImageCopyBuffer: Sendable {
+public struct GPUImageCopyBuffer {
     /// The buffer.
     public var buffer: GPUBuffer
 
@@ -597,7 +597,7 @@ public struct GPUImageCopyBuffer: Sendable {
 }
 
 /// A texture image copy.
-public struct GPUImageCopyTexture: Sendable {
+public struct GPUImageCopyTexture {
     /// The texture.
     public var texture: GPUTexture
 

@@ -13,14 +13,16 @@ This package is designed for Swift compiled to WebAssembly, running in a browser
 ## Build Commands
 
 ```bash
-# Build the package (note: designed for WASM target, native build will show Sendable warnings)
-swift build
+# Native compatibility build
+TOOLCHAINS=org.swift.64202607171a xcrun swift build
 
 # Run tests
-swift test
+perl -e 'alarm 120; exec @ARGV' -- \
+  xcodebuild test -scheme SwiftWebGPU-Package -destination 'platform=macOS'
 
-# Build for WASM (requires SwiftWasm toolchain)
-swift build --triple wasm32-unknown-wasi
+# Build for WASM with the fixed Swift 6.4 SDK
+TOOLCHAINS=org.swift.64202607171a xcrun swift build \
+  --swift-sdk swift-6.4.x-DEVELOPMENT-SNAPSHOT-2026-07-17-a_wasm
 ```
 
 ## Architecture
@@ -28,9 +30,10 @@ swift build --triple wasm32-unknown-wasi
 ### Core Design Patterns
 
 **1. JSObject Wrapper Pattern**
-All WebGPU objects wrap a JavaScript `JSObject`:
+All WebGPU objects wrap an owner-thread-bound JavaScript `JSObject`. These
+wrappers must remain non-`Sendable`; async methods preserve caller isolation.
 ```swift
-public final class GPUDevice: Sendable {
+public final class GPUDevice {
     let jsObject: JSObject
     init(jsObject: JSObject) { self.jsObject = jsObject }
 }
